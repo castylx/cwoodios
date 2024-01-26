@@ -1,0 +1,172 @@
+#!/home/castylx/miniconda3/envs/py311env/bin/python
+from fractions import Fraction
+from fpdf import FPDF
+import sys
+
+#################################################################
+# Takes a string and returns a Fractionn value
+#################################################################
+def genf(value):
+    lsvals = value.split()
+
+    # Error checking in case we make a mistake when entering a fraction
+    if (len(lsvals) > 2):
+        print("ERROR ==> Unable to get fraction values from {}".format(value))
+    # elif (len(lsvals) == 1) and ()
+
+    # Check to see what we should return
+    if (len(lsvals) == 1):
+        num = lsvals[0]
+        return Fraction(num)
+    else:
+        digit = int(lsvals[0])
+        (numerators, denomitors) = lsvals[1].split("/")
+        numerator = int(numerators)
+        denomitor = int(denomitors)
+
+        numerator = (denomitor*digit) + numerator
+        return Fraction(numerator, denomitor)
+    
+    return None
+
+####################################################################
+# Asks the question from user and returns a Fraction representation
+#####################################################################
+def getf(msg, fallback=None):
+    selection = None
+
+    while (selection is None):
+        try:
+            if (fallback is None):
+                selection = input("{:20} > ".format(msg))
+            else:
+                selection = input(msg + "(default:" + fallback + ") > ")
+                if (selection == ""):
+                    selection = fallback
+
+            selection = genf(selection)
+        except ValueError:
+            print("Unable to process number, please enter again")
+            selection = None
+
+    return selection
+
+def single_door():
+    print("Single Door Selected")
+    height   = getf("height")
+    width    = getf("width")
+    overhang = getf("overhang", "1/2")
+    rswidth  = getf("Rails/Stiles Width ")
+    twidth  = width  + (Fraction("2") * overhang)
+    theight = height + (Fraction("2") * overhang)
+
+    # Panel width and height
+    pwidth  = twidth - (2*rswidth) + Fraction("3/4") - Fraction ("1/16")
+    pheight = theight - (2*rswidth) + Fraction("3/4") - Fraction("1/16")
+
+    # Rails width
+    rwidth  = twidth- (2*rswidth) + Fraction("3/4")
+
+    # Stiles height
+    sheight = theight + (Fraction("2") * overhang)
+
+    # Create Door
+    door = Door("Single Door")
+    door.set_panel(Board(pwidth, pheight))
+    door.set_rail(Board(rwidth, Fraction("2.5")))
+    door.set_stile(Board(Fraction("2.5"), sheight))
+
+    print ("==========================  Cut List ==========================")
+    print ("     Assuming whitehead router bits w/ 3/8 inch channel      \n")
+    door.print()
+    print ("===============================================================")
+
+    return door
+
+def double_door():
+    doors = []
+    print("Double Door Selected\n")
+
+    width    = getf("Width")
+    height   = getf("Height")
+    overhang = getf("Overhang", "1/2")
+    rswidth  = getf("Rails/Stiles Width ")
+    twidth  = (width  + (Fraction("2") * overhang) - Fraction("1/8")) * Fraction("1/2")
+    theight = height + (Fraction("2") * overhang)
+#    print ("TOTAL WIDTH IS {}\n".format(fractionp(twidth)))
+    rwidth  = (twidth + Fraction("3/4")) -  (Fraction("2") * rswidth)
+    pheight = (theight + Fraction(3, 4)) - (Fraction("2")*rswidth)
+
+    # Panel width and height
+    pwidth  = rwidth - Fraction("1/16")
+    pheight = pheight - Fraction("1/16")
+
+    # Create Door
+    door = Door("Single Door")
+    door.set_panel(Board(pwidth, pheight))
+    door.set_rail(Board(rwidth, Fraction("2.5")))
+    door.set_stile(Board(Fraction("2.5"), theight))
+
+    print ("=====================  Cut List Per Door ====================")
+    print ("     Assuming whitehead router bits w/ 3/8 inch channel      \n")
+    # print (" TOTAL DOOR SIZE Width : {} Height : {}\n".format( fractionp(twidth), fractionp(theight)))
+    door.print()
+    print ("=============================================================")
+
+    doors.append(door)
+    doors.append(door)
+
+    return doors
+
+print("========================================\n")
+print("Welcome to Fernando's cut list program!\n")
+print("========================================\n")
+
+# Keep track of all cut lists
+cutlist = []
+
+try :
+    while(True):
+        print("Please select an option below :")
+        print("\t (1) Single Door")
+        print("\t (2) Double Door")
+        print("\t (3) Generate PDF")
+        print("\t (4) Exit")
+        print("")
+        selection = input("Selection > ")
+        
+        match selection:
+            case "1":
+                try: 
+                    door = single_door()
+                    cutlist.append(door)
+                except KeyboardInterrupt:
+                        print("\n")
+            case "2":
+                try:
+                    doors = double_door()
+                    cutlist.extend(doors)
+                except KeyboardInterrupt:
+                    print("\n")
+            case "3":
+                if (len(cutlist) == 0):
+                    print("Unable to generate cutlist, nothing has been generated thus far")
+                else:
+                    print("Generating pdf for all projects")
+                    project = input("What would you like to call this project ? > ")
+                    filename = input("Please enter the filename > ")
+                    if (filename.endswith(".pdf") == False):
+                        filename = filename + ".pdf"
+
+                    plan = Plans(filename, cutlist)
+                    plan.generate()
+                    print("Done generating pdf for project {}".format(project))
+            case "4":
+                sys.exit(1)
+            case "exit":
+                sys.exit(1)
+            case _:
+                print("Selection {} does not exist".format(selection))
+except KeyboardInterrupt:
+    print("\n")
+    sys.exit(1)

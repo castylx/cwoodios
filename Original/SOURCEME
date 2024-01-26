@@ -1,0 +1,2 @@
+setenv PYTHONPATH `pwd`/pkgs
+setenv PATH "`pwd`/bin:$PATH"
