@@ -1,0 +1,28 @@
+{
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "sourceLanguages": [
+                "swift"
+            ],
+            "args": [],
+            "cwd": "${workspaceFolder:cwoodios}",
+            "name": "Debug CWood",
+            "program": "${workspaceFolder:cwoodios}/.build/debug/CWood",
+            "preLaunchTask": "swift: Build Debug CWood"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "sourceLanguages": [
+                "swift"
+            ],
+            "args": [],
+            "cwd": "${workspaceFolder:cwoodios}",
+            "name": "Release CWood",
+            "program": "${workspaceFolder:cwoodios}/.build/release/CWood",
+            "preLaunchTask": "swift: Build Release CWood"
+        }
+    ]
+}
