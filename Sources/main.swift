@@ -113,12 +113,13 @@ while true {
             print("Generating pdf for all projects")
             print("Enter Project Name > ", terminator: "")
             guard let project = readLine() else { continue }
-            
+
             print("Enter Filename > ", terminator: "")
             guard let filename = readLine() else { continue }
 
             let plan = Plans(projectName: project, filename: filename, cutlist: cutlist)
             plan.generate()
+            PDF.createFlyer()
             print("Done generating pdf for project \(project)")
         }
     case "7", "exit":
