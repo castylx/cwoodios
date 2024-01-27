@@ -1,11 +1,16 @@
 import Foundation
 
+protocol Cut {
+    func genpdf(x: Int, y: Int)
+    func name() -> String
+}
+
 enum DoorType {
     case Single
     case Double
 }
 
-struct Door : CustomStringConvertible {
+struct Door : CustomStringConvertible, Cut {
     let title : String
     let ohang : Fraction
     let owidth : Fraction
@@ -97,6 +102,17 @@ struct Door : CustomStringConvertible {
         dict["q"] = String(qty)
 
         return dict
+    }
+
+    func name() -> String {
+        return "DOOR"
+    }
+ 
+    /*
+    Generate the pdf drawing for the cutlist, you only get one page to draw everything
+    */
+    func genpdf(x: Int, y: Int) {
+        print("Door is Generating the pdf baby!")
     }
 
     // func genpdf(pdf: PDF, currentx: Int, currenty: Int) -> [[String: String]] {

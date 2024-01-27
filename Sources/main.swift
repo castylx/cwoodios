@@ -44,14 +44,14 @@ func getf(prompt: String, fallback: String? = nil) -> Fraction? {
     return selection
 }
 
-func doubleDoor() {
+func doubleDoor() -> Cut? {
     print("Double Door Selected")
     print("Double Doors Description > ", terminator: "")
-    guard let title = readLine() else { return }
-    guard let width = getf(prompt: "Opening Width") else { return }
-    guard let height = getf(prompt: "Opening Height") else { return }
-    guard let overhang = getf(prompt: "Overhang", fallback: "1/2") else { return }
-    guard let rswidth = getf(prompt: "Rails/Stiles Width ", fallback: "2 1/2") else { return }
+    guard let title = readLine() else { return nil }
+    guard let width = getf(prompt: "Opening Width") else { return nil }
+    guard let height = getf(prompt: "Opening Height") else { return nil }
+    guard let overhang = getf(prompt: "Overhang", fallback: "1/2") else { return nil }
+    guard let rswidth = getf(prompt: "Rails/Stiles Width ", fallback: "2 1/2") else { return nil}
 
     // Create Door
     let doors = Door(doorType:.Double, called:title, owidth:width, x:height, with:overhang, and:rswidth)
@@ -66,10 +66,10 @@ func doubleDoor() {
     print("\(doors)")
     print("=============================================================")
 
-    // return doors
+    return doors
 }
 
-var cutlist: [Any] = []
+var cutlist: [Cut] = []
 
 while true {
     print("Please select an option below :")
@@ -89,8 +89,11 @@ while true {
         // let door = singleDoor()
         // cutlist.append(door)
     case "2":
-        doubleDoor()
-        // cutlist.append(doors)
+        if let doors = doubleDoor() {
+            cutlist.append(doors)
+        } else {
+            print("Failed to create double door")
+        }
     case "3":
         print("Drawer Selected")
         // let drawer = drawer()
@@ -108,11 +111,15 @@ while true {
             print("Unable to generate cutlist, nothing has been generated thus far")
         } else {
             print("Generating pdf for all projects")
-            // guard let project = readLine(),
-            //       let filename = readLine() else { continue }
-            // let plan = Plans(project: project, filename: filename, cutlist: cutlist)
-            // plan.generate()
-            // print("Done generating pdf for project \(project)")
+            print("Enter Project Name > ", terminator: "")
+            guard let project = readLine() else { continue }
+            
+            print("Enter Filename > ", terminator: "")
+            guard let filename = readLine() else { continue }
+
+            let plan = Plans(projectName: project, filename: filename, cutlist: cutlist)
+            plan.generate()
+            print("Done generating pdf for project \(project)")
         }
     case "7", "exit":
         exit(0)
